@@ -6,6 +6,7 @@ on: push
 env:                       # 1) workflow-level
   GLOBAL_FLAG: "--verbose"
 
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,3 +27,12 @@ jobs:
         run: |
           echo "Step-only: $STEP_ONLY"
           echo "Via context: ${{ env.STEP_ONLY }}"
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Use configuration variables
+        run: |
+          echo "Runner: ${{ vars.RUNNER }}"
+          echo "Service URL: ${{ vars.SERVICE_URL }}"
