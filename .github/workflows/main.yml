@@ -1,0 +1,28 @@
+
+# .github/workflows/example.yml
+name: Env variables demo
+on: push
+
+env:                       # 1) workflow-level
+  GLOBAL_FLAG: "--verbose"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:                   # 2) job-level
+      JOB_NAME: "build-job"
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Use envs in shell
+        run: |
+          echo "Global: $GLOBAL_FLAG"
+          echo "Job: $JOB_NAME"
+
+      - name: Step-level env
+        env:               # 3) step-level
+          STEP_ONLY: "42"
+        run: |
+          echo "Step-only: $STEP_ONLY"
+          echo "Via context: ${{ env.STEP_ONLY }}"
