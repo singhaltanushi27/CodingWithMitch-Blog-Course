@@ -5,7 +5,6 @@ on: push
 
 env:                       # 1) workflow-level
   GLOBAL_FLAG: "--verbose"
-
   
 jobs:
   build:
@@ -27,6 +26,13 @@ jobs:
         run: |
           echo "Step-only: $STEP_ONLY"
           echo "Via context: ${{ env.STEP_ONLY }}"
+      
+      - name: Context vs env
+        run: |
+          echo "Repo (env): $GITHUB_REPOSITORY"
+          echo "Ref (context): ${{ github.ref }}"
+          echo "Commit: ${{ github.sha }}"
+
 
   deploy:
     runs-on: ubuntu-latest
@@ -36,3 +42,5 @@ jobs:
         run: |
           echo "Runner: ${{ vars.RUNNER }}"
           echo "Service URL: ${{ vars.SERVICE_URL }}"
+
+
