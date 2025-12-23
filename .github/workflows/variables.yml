@@ -1,0 +1,13 @@
+name: Access Rules and Context T
+on:
+  push 
+
+env:
+  STEP_LABEL: "Say hello"
+  
+jobs:
+  access-Rules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ${{ env.STEP_LABEL }}   # using env in a step name
+        run: echo "Hi!"
