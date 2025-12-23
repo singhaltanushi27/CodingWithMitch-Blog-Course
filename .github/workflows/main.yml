@@ -36,7 +36,7 @@ jobs:
       - name: Use a secret safely
         env:
           API_TOKEN: ${{ secrets.MY_API_TOKEN }}
-        run: curl -H "Authorization:Bearer $API_TOKEN" https://api.example.com
+        run: curl -H "Authorization:Bearer $API_TOKEN" https://github.com/singhaltanushi27/CodingWithMitch-Blog-Course
 
 
   deploy:
