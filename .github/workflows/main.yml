@@ -39,6 +39,13 @@ jobs:
         run: curl -H "Authorization:Bearer $API_TOKEN" https://github.com/singhaltanushi27/CodingWithMitch-Blog-Course
 
 
+      - name: Compute release version
+        run: |
+          echo "RELEASE_VER=1.2.${{ github.run_number }}" >> "$GITHUB_ENV"
+      
+      - name: Use computed env var later
+        run: echo "Release version is $RELEASE_VER"
+
   deploy:
     runs-on: ubuntu-latest
     environment: production
