@@ -1,0 +1,24 @@
+name: expressions CI
+on: push 
+
+env:
+  MY_BOOLEAN: ${{ true }}
+  MY_NULL:    ${{ null }}
+  MY_NUMBER:  ${{ 0xff }}
+  MY_STRING:  ${{ 'Hello!' }}
+
+jobs:
+  expressions:
+    if: ${{ github.ref == 'refs/heads/main' && contains(matrix.os, 'ubuntu') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Format greeting
+        run: echo "${{ format('{0}, {1}!', github.actor, matrix.greeting) }}"
+      
+      - name: Convert to JSON
+        run: echo "${{ toJSON(job) }}"
+      
+      - name: Parse JSON
+        env: ${{ fromJSON('{"FOO":"bar"}') }}
+        run: echo "$FOO"
+
