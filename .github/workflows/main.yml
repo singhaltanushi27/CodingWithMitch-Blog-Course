@@ -33,6 +33,11 @@ jobs:
           echo "Ref (context): ${{ github.ref }}"
           echo "Commit: ${{ github.sha }}"
 
+      - name: Use a secret safely
+        env:
+          API_TOKEN: ${{ secrets.MY_API_TOKEN }}
+        run: curl -H "Authorization:Bearer $API_TOKEN" https://api.example.com
+
 
   deploy:
     runs-on: ubuntu-latest
