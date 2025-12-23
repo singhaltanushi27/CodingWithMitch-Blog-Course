@@ -9,16 +9,27 @@ env:
 
 jobs:
   expressions:
-    if: ${{ github.ref == 'refs/heads/main' && contains(matrix.os, 'ubuntu') }}
+   
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+          os: [ubuntu-latest, macos-latest]
+    if: ${{ github.ref == 'refs/heads/master' && contains(matrix.os, 'ubuntu') }}
     steps:
       - name: Format greeting
         run: echo "${{ format('{0}, {1}!', github.actor, matrix.greeting) }}"
       
       - name: Convert to JSON
-        run: echo "${{ toJSON(job) }}"
+        run: echo "${{ toJSON(jobs) }}"
       
       - name: Parse JSON
         env: ${{ fromJSON('{"FOO":"bar"}') }}
         run: echo "$FOO"
+        
+      - run: echo "All good"
+        if: ${{ success() }}
+      
+      - run: echo "This always runs"
+        if: ${{ always() }}
+
 
