@@ -1,5 +1,5 @@
 name: expressions CI
-on: push 
+on: push
 
 env:
   MY_BOOLEAN: ${{ true }}
@@ -9,27 +9,29 @@ env:
 
 jobs:
   expressions:
-   
     runs-on: ubuntu-latest
     strategy:
       matrix:
-          os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest]
+
+    # Use plain '&&'. If your default branch is 'main', change master -> main
     if: ${{ github.ref == 'refs/heads/master' && contains(matrix.os, 'ubuntu') }}
+
     steps:
-      - name: Format greeting
-        run: echo "${{ format('{0}, {1}!', github.actor, matrix.greeting) }}"
-      
-      - name: Convert to JSON
-        run: echo "${{ toJSON(jobs) }}"
-      
-      - name: Parse JSON
+      - name: Show OS
+        run: echo "OS=${{ matrix.os }}"
+
+      - name: Convert current job to JSON
+        run: echo "${{ toJSON(job) }}"
+
+      - name: Parse JSON into env
         env: ${{ fromJSON('{"FOO":"bar"}') }}
         run: echo "$FOO"
-        
-      - run: echo "All good"
+
+      - name: All good (runs if previous steps succeeded)
         if: ${{ success() }}
-      
-      - run: echo "This always runs"
+        run: echo "All good"
+
+      - name: Always runs
         if: ${{ always() }}
-
-
+        run: echo "This always runs"
