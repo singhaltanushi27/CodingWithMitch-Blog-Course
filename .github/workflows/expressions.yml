@@ -1,3 +1,4 @@
+
 name: expressions CI
 on: push
 
@@ -9,20 +10,28 @@ env:
 
 jobs:
   expressions:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
+        greeting: [Hello, Howdy]
 
-    # Use plain '&&'. If your default branch is 'main', change master -> main
-    if: ${{ github.ref == 'refs/heads/master' && contains(matrix.os, 'ubuntu') }}
+    # Use the matrix value so the 'matrix' context is available to the job
+    runs-on: ${{ matrix.os }}
+
+    # Use real '&&' (not HTML-escaped), and ensure branch name is correct
+    if: ${{ github.ref == 'refs/heads/main' && contains(matrix.os, 'ubuntu') }}
 
     steps:
-      - name: Show OS
-        run: echo "OS=${{ matrix.os }}"
+      - name: Show matrix values
+        run: |
+          echo "OS=${{ matrix.os }}"
+          echo "Greeting=${{ matrix.greeting }}"
+
+      - name: Format greeting
+        run: echo "${{ format('{0}, {1}!', github.actor, matrix.greeting) }}"
 
       - name: Convert current job to JSON
-        run: echo "${{ toJSON(job) }}"
+        run: echo "${{ toJSON(job) }}"    # 'jobs' is only for reusable workflows
 
       - name: Parse JSON into env
         env: ${{ fromJSON('{"FOO":"bar"}') }}
