@@ -1,7 +1,16 @@
-name: concurrency 
+
+name: Workflow-Level Concurrency
 on:
   push:
-    branches: [main]
+    branches: master
+
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}   # Unique per workflow + branch
   cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Building on ${{ github.ref }}"
