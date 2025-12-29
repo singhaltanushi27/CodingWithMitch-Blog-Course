@@ -1,0 +1,12 @@
+name: Caller Workflow
+on:
+  push:
+    branches: master
+
+jobs:
+  use-build:
+    uses: .github/workflows/called.yml
+    with:
+      node-version: '20'
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
