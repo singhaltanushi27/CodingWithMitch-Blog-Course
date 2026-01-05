@@ -1,0 +1,64 @@
+
+# .github/workflows/deploy-with-oidc-aws.yml
+name: Deploy to AWS via OIDC
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  # Required to request an OIDC token
+  id-token: write
+  # Typical minimal permissions to read repo content
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    # Optional: pin which environment is used (reflected in OIDC token claims)
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js (example build step)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install & Build
+        run: |
+          npm ci
+          npm run build
+
+      # ------------------------------------------------------------------
+      # OIDC login to AWS:
+      # This action exchanges the GitHub-issued OIDC token for short-lived
+      # AWS credentials by assuming an IAM role you've configured for OIDC.
+      # ------------------------------------------------------------------
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::123456789012:role/github-oidc-deploy-role
+          # Optional: further restrict with session name or audience
+          role-session-name: github-actions-deploy
+          # audience is usually "sts.amazonaws.com"; omit unless you changed defaults
+          # audience: sts.amazonaws.com
+
+      - name: Sync build artifacts to S3
+        run: |
+          aws s3 sync dist/ s3://my-website-prod-bucket/ \
+            --delete \
+            --cache-control "public, max-age=300" \
+            --acl public-read
+
+      - name: Invalidate CloudFront cache (optional)
+        run: |
+          DISTRIBUTION_ID=E123ABC456XYZ
+          aws cloudfront create-invalidation \
+            --distribution-id "$DISTRIBUTION_ID" \
+            --paths "/*"
