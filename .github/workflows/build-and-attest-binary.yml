@@ -1,0 +1,39 @@
+
+# .github/workflows/build-and-attest-binary.yml
+name: Build & Attest Binary
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  id-token: write        # OIDC token for Sigstore signing
+  contents: read
+  attestations: write    # store attestation with repo
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build artifact (example)
+        run: |
+          mkdir -p _artifacts
+          echo "Hello from $(date)" > _artifacts/hello.txt
+          tar -czf hello.tar.gz _artifacts
+
+      # Generate the attestation for the artifact we just built
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: 'hello.tar.gz'   # path to the artifact (supports single path or globs) [1](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations)
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hello
+          path: hello.tar.gz
